@@ -6,11 +6,15 @@ using UnityEngine.Events;
 
 namespace Arachnid {
 
-    public class GameEventListener : MonoBehaviour {
+    public class GameEventListener : MonoBehaviour 
+    {
 
         [AssetsOnly, Tooltip("When any of these game events happen, the below response will happen!")]
         public List<GameEvent> gameEvents = new List<GameEvent>();
         public UnityEvent response;
+        
+        [MultiLineProperty(5), HideLabel, FoldoutGroup("Comments")]
+        public string comment;
 
         void OnEnable()
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using System.Linq;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 namespace Arachnid
@@ -14,28 +15,36 @@ namespace Arachnid
     {
         public enum LimitType { RemoveFirst, RemoveLast, RemoveRandom}
 
-        [ToggleLeft, Tooltip("Log whenever an element is added / removed to collection.")]
+        [TabGroup("main", "Main"), ToggleLeft, Tooltip("Log whenever an element is added / removed to collection.")]
         public bool debug;
 
-        [MultiLineProperty, SerializeField, ShowInInspector, HideLabel, Title("Description")]
+        [TabGroup("main", "Main"),MultiLineProperty, SerializeField, ShowInInspector, HideLabel, Title("Description")]
         string description;
 
-        [ToggleLeft]
+        [TabGroup("main", "Main"),ToggleLeft]
         public bool limitSize;
 
-        [MinValue(1), ShowIf("limitSize"), Indent]
+        [TabGroup("main", "Main"), MinValue(1), ShowIf("limitSize"), Indent]
         public int maxSize = 1;
 
-        [Tooltip("If the limit is surpassed, what element should be destroyed?"), ShowIf("limitSize"), Indent]
+        [TabGroup("main", "Main"), Tooltip("If the limit is surpassed, what element should be destroyed?"), ShowIf("limitSize"), Indent]
         public LimitType limitAction = LimitType.RemoveFirst;
 
         /// <summary>
         /// All the elements that are currently active.
         /// </summary>
+        [TabGroup("main", "Main")]
         public List<CollectionElement> elements = new List<CollectionElement>();
 
-        public event Action<GameObject> onElementAdded;
-        public event Action<GameObject> onElementRemoved;
+
+        [TabGroup("main", "Events")]
+        public UnityEvent onElementAdded;
+        
+        [TabGroup("main", "Events")]
+        public UnityEvent onElementRemoved;
+
+        [TabGroup("main", "Events")]
+        public UnityEvent onListBecomeEmpty;
 
         /// <summary>
         /// Add the given element to this collection.
@@ -45,7 +54,7 @@ namespace Arachnid
             if (elements.Contains(element)) return;
             elements.Add(element);
 
-            onElementAdded?.Invoke(element.gameObject);
+            onElementAdded.Invoke();
 
             if (debug) Debug.Log(element.name + " was added to " + name + " at " + Time.unscaledTime);
 
@@ -57,11 +66,13 @@ namespace Arachnid
         /// </summary>
         public void Remove (CollectionElement element)
         {
-            if (elements.Remove(element))
-            {
-                onElementRemoved?.Invoke(element.gameObject);
-                if (debug) Debug.Log(element.name + " was removed from " + name + " at " + Time.unscaledTime);
-            }
+            if (!elements.Remove(element)) return;
+            
+            onElementRemoved.Invoke();
+            if (elements.Count < 1) 
+                onListBecomeEmpty.Invoke();
+                
+            if (debug) Debug.Log(element.name + " was removed from " + name + " at " + Time.unscaledTime);
         }
 
         /// <summary>
@@ -74,9 +85,11 @@ namespace Arachnid
             return false;
         }
 
+        
         /// <summary>
         /// Destroy all elements of this collection.
         /// </summary>
+        [Button]
         public void DestroyAll()
         {
             for (int i = elements.Count - 1; i >= 0; i--)

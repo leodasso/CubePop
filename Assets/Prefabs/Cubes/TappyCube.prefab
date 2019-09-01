@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1261587559}
   - component: {fileID: 1261587560}
   - component: {fileID: 1261587561}
+  - component: {fileID: 5360200818626030583}
   m_Layer: 0
   m_Name: TappyCube
   m_TagString: Untagged
@@ -179,3 +180,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8245908bae7c73d44850b748149c8cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5360200818626030583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2759086017471961781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 219da9824ea70fd4882cd1b0bb8203cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collection: {fileID: 11400000, guid: 7fbdaf00ab380ec4cb357bf50a7f3bef, type: 2}

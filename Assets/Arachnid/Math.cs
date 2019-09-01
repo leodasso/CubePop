@@ -26,5 +26,53 @@ namespace Arachnid
 			float rad = Mathf.Atan2(rotatedVector.y, rotatedVector.x);
 			return Mathf.Rad2Deg * rad;
 		}
+
+		/// <summary>
+		/// Given the input, returns a number that's rounded to the nearest increment. For example, given an input
+		/// of 7.55 and an increment of 5, will round to 10. An input of 6 with increment 5 will round to 5. Only accepts
+		/// positive rounding increments.
+		/// </summary>
+		public static float RoundToNearest(float input, float roundingIncrement)
+		{
+			roundingIncrement = Mathf.Abs(roundingIncrement);
+			
+			// failsafe for rounding increments near 0
+			if (roundingIncrement <= Mathf.Epsilon) return input;
+			
+			float remainder = Mathf.Abs(input) % roundingIncrement;
+			float half = roundingIncrement / 2;
+
+			if (input >= 0)
+			{
+				if (remainder < half)
+					return input - remainder;
+				else
+					return input + roundingIncrement - remainder;
+			}
+
+			// negative numbers are fun
+			if (remainder < half)
+				return input + remainder;
+			else
+				return input - roundingIncrement + remainder;
+			
+		}
+
+		public static bool LayerMaskContainsLayer(LayerMask layerMask, int layer)
+		{
+			return layerMask == (layerMask | (1 << layer));
+		}
+
+		/// <summary>
+		/// Given any arbitrary angle, returns that same angle but expressed as a number between 0 and 360
+		/// </summary>
+		public static float Angle0to360(float inputAngle)
+		{
+			if (inputAngle >= 0) return inputAngle % 360;
+
+			inputAngle = Mathf.Abs(inputAngle);
+			float remainder = inputAngle % 360;
+			return 360 - remainder;
+		}
 	}
 }

@@ -2,42 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.Events;
 
 namespace Arachnid {
 
     [RequireComponent(typeof(Collider2D))]
-    public class EventTrigger2D : MonoBehaviour
+    [TypeInfoBox("When the attached 2D Collider is triggered, will Invoke the events contained below.")]
+    public class EventTrigger2D : FilteredTrigger2D
     {
         [AssetsOnly]
         public List<GameEvent> events = new List<GameEvent>();
+        public UnityEvent uEvent;
 
-        [ToggleLeft, Tooltip("Only allow triggers from objects of a particular collection")]
-        public bool filterTriggers = true;
-
-        [ShowIf("filterTriggers"), Tooltip("Any object in one of these collections can trigger this."), AssetsOnly]
-        public List<Collection> triggerers = new List<Collection>();
-
-
-        void OnTriggerEnter2D(Collider2D other)
+        protected override void OnTriggered(Collider2D triggerer)
         {
-            if (!filterTriggers)
-            {
-                Trigger();
-                return;
-            }
-
-            foreach (var c in triggerers)
-            {
-                if (c.ContainsGameObject(other.gameObject))
-                {
-                    Trigger();
-                    return;
-                }
-            }
-        }
-
-        void Trigger()
-        {
+            uEvent.Invoke();
             foreach (var e in events) e.Raise();
         }
     }

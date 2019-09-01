@@ -10,9 +10,14 @@ namespace Arachnid
     public class GameEvent : ScriptableObject
     {
         [ToggleLeft]
+        public bool enabled = true;
+        
+        [ToggleLeft]
         public bool debug;
         [ShowInInspector]
         List<GameEventListener> listeners = new List<GameEventListener>();
+
+        public float delay;
 
         [DrawWithUnity]
         public UnityEvent onEventRaised;
@@ -23,15 +28,42 @@ namespace Arachnid
         [Button]
         public void Raise()
         {
-            if (debug)
-                Debug.Log(name + " event was raised at " + Time.unscaledTime);
+            if (!enabled)
+            {
+                if (debug) 
+                    Debug.Log(name + " event was raised, but it is not enabled.");
+                
+                return;
+            }
             
+            if (debug)
+                Debug.Log(name + " event was raised at " + Time.unscaledTime, this);
+
+            if (delay > 0)
+            {
+                if (debug)
+                    Debug.Log(name + " has a delay of " + delay + " seconds.", this);
+                
+                CoroutineHelper.NewCoroutine(DelayedRaise());
+            }
+            
+            else RaiseInternal();
+        }
+
+        void RaiseInternal()
+        {
             onEventRaised.Invoke();
 
             for (int i = listeners.Count - 1; i >= 0; i--)
             {
                 listeners [i].OnEventRaised();
             }
+        }
+
+        IEnumerator DelayedRaise()
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            RaiseInternal();
         }
 
         public void RegisterListener(GameEventListener instance)
